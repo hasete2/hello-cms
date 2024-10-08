@@ -39,7 +39,7 @@ func (h *Handler) content(c echo.Context) error {
 	slug := c.Param("slug")
 	content, err := h.contentDomain.GetContent(slug)
 	if err != nil {
-		return c.String(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, err)
 	}
 	return c.JSON(http.StatusOK, content)
 }

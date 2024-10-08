@@ -27,7 +27,7 @@ func (c *ContentDomain) GetContents() ([]models.Content, error) {
 		ORDER BY posted_at DESC
 		LIMIT 10;`
 
-	var contents []models.Content
+	contents := []models.Content{}
 	rows, err := c.db.Query(query)
 	if err != nil {
 		return contents, err
@@ -61,7 +61,7 @@ func (c *ContentDomain) GetTagedContents(tag string) ([]models.Content, error) {
 		ORDER BY posted_at DESC
 		;`
 
-	var contents []models.Content
+	contents := []models.Content{}
 	rows, err := c.db.Query(query, tag)
 	if err != nil {
 		return contents, err
@@ -87,7 +87,7 @@ func (c *ContentDomain) GetTagedContents(tag string) ([]models.Content, error) {
 }
 
 func (c *ContentDomain) GetTags() ([]models.Tag, error) {
-	var tags []models.Tag
+	tags := []models.Tag{}
 
 	query := `
 		SELECT tag, COUNT(0) AS _cnt 
@@ -114,9 +114,9 @@ func (c *ContentDomain) GetTags() ([]models.Tag, error) {
 	return tags, nil
 }
 
-func (c *ContentDomain) GetContent(slug string) (models.Content, error) {
+func (c *ContentDomain) GetContent(slug string) (models.Content, *models.Response) {
 	var content models.Content
-
+	var response models.Response
 	query := `SELECT 
 	html, title, posted_at, slug
 	FROM entries 
@@ -125,12 +125,16 @@ func (c *ContentDomain) GetContent(slug string) (models.Content, error) {
 	row := c.db.QueryRow(query, slug)
 	err := row.Scan(&content.Html, &content.Title, &content.PostedAt, &content.Slug)
 	if err != nil {
-		return content, err
+		response.StatusCode = 400
+		response.Message = "Content Not Found."
+		return content, &response
 	}
 
 	content.Tags, err = content.GetTags(c.db)
 	if err != nil {
-		return content, err
+		response.StatusCode = 500
+		response.Message = err.Error()
+		return content, &response
 	}
 
 	return content, nil
