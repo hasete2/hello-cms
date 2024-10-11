@@ -20,6 +20,7 @@ func (h *Handler) Register(e *echo.Echo) {
 	e.GET("/contents", h.contents)
 	e.GET("/contents/t/:tag", h.contents)
 	e.GET("/tags", h.tags)
+	e.GET("/slugs", h.slugs)
 	e.GET("/c/:slug", h.content)
 	e.POST("/content", h.post_content)
 }

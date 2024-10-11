@@ -197,3 +197,30 @@ func (c *ContentDomain) PostContent(body string) (err error) {
 
 	return nil
 }
+
+func (c *ContentDomain) GetSlugs() ([]string, error) {
+	slugs := []string{}
+
+	query := `
+		SELECT slug 
+		FROM entries 
+		WHERE is_visible='1';`
+
+	rows, err := c.db.Query(query)
+	if err != nil {
+		return slugs, nil
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var s string
+		err := rows.Scan(&s)
+		if err != nil {
+			return slugs, err
+		}
+
+		slugs = append(slugs, s)
+	}
+
+	return slugs, nil
+}

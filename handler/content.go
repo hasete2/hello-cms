@@ -35,6 +35,15 @@ func (h *Handler) tags(c echo.Context) error {
 	return c.JSON(http.StatusOK, tags)
 }
 
+func (h *Handler) slugs(c echo.Context) error {
+	slugs, err := h.contentDomain.GetSlugs()
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, slugs)
+}
+
 func (h *Handler) content(c echo.Context) error {
 	slug := c.Param("slug")
 	content, err := h.contentDomain.GetContent(slug)
